@@ -1,6 +1,8 @@
 ﻿
 using System.Text;
 
+
+// constants for titles, menus, etc.
 const string mathGameTitle = "Console Math Game";
 const string GHViewTitle = "Game History View";
 const string prompt =
@@ -16,8 +18,10 @@ const string GHMenu =
     "3. exit\n\n" +
     "cmd: ";
 
+// error messages are stored here for later display
 List<string> messages = new List<string>();
 
+// past operations are stored here
 LinkedList<MathGame> gameHistory = new LinkedList<MathGame>();
 
 void clearWindow()
@@ -38,6 +42,7 @@ bool isValidOption(string option, int optionCount, out int value)
     return false;
 }
 
+// handles division and potential errors
 void divide(ref int result, int arg)
 {
     if (arg == 0)
@@ -76,6 +81,7 @@ bool GHPrev(ref LinkedListNode<MathGame> node)
     return true;
 }
 
+// loop for the game history view
 void gameHistoryView()
 {
     if (gameHistory.Count == 0)
@@ -127,6 +133,7 @@ void gameHistoryView()
 string? cmdString, argString;
 int total = 0, arg, cmd, prev;
 
+// main Math Game loop
 do
 {
     clearWindow();
@@ -186,6 +193,7 @@ do
 }
 while (true);
 
+// representation of past games
 struct MathGame
 {
     int[] operands = new int[2];

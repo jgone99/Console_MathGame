@@ -1,17 +1,16 @@
 ﻿
-string mathGameTitle = "Console Math Game";
+using System.Text;
 
-string GHViewTitle = "Game History View";
-
-string prompt =
+const string mathGameTitle = "Console Math Game";
+const string GHViewTitle = "Game History View";
+const string prompt =
     "1. add\n" +
     "2. subtract\n" +
     "3. multiply\n" +
-    "4. divide\n" +
+    "4. integer divide\n" +
     "5: view game history\n\n" +
     "cmd: ";
-
-string GHMenu =
+const string GHMenu =
     "1. previous\n" +
     "2. next\n" +
     "3. exit\n\n" +
@@ -24,49 +23,34 @@ LinkedList<MathGame> gameHistory = new LinkedList<MathGame>();
 void clearWindow()
 {
     (int cX, int cY) = Console.GetCursorPosition();
-    string newWindow = "";
-    for (int i = 0; i < Console.WindowHeight + cY; i++)
-    {
-        newWindow += "\n";
-    }
+    StringBuilder newWindow = new StringBuilder();
+    newWindow.Append('\n', Console.WindowHeight + cY);
     Console.Write(newWindow);
     Console.SetCursorPosition(cX, cY);
 }
 
-bool isValidOption(string option, int optionCount)
+bool isValidOption(string option, int optionCount, out int value)
 {
-    if (string.IsNullOrEmpty(option))
-        return false;
-
-    option = option.Trim();
-
-    if ((option.Length == 1) && char.IsDigit(option[0]))
+    if (int.TryParse(option, out value))
     {
-        return char.GetNumericValue(option[0]) <= optionCount && option[0] >= '1';
+        return value >= 1 && value <= optionCount;
     }
-
     return false;
 }
 
-bool isValidArg(string arg)
+void divide(ref int result, int arg)
 {
-    if (string.IsNullOrEmpty(arg))
-        return false;
-
-    arg = arg.Trim();
-
-    for (int i = 0; i < arg.Length; i++)
+    if (arg == 0)
     {
-        if (!char.IsDigit(arg[i]) && (arg[i] != '-' || i != 0))
-            return false;
+        messages.Add("Cannot divide by zero");
+        return;
     }
-
-    return true;
+    result /= arg;
 }
 
 void displayMessages()
 {
-    messages.ForEach(str => Console.Write($"\n{str}\n"));
+    messages.ForEach(str => Console.Write($"\n--- ALERT: {str} ---\n"));
     messages.Clear();
 }
 
@@ -106,24 +90,24 @@ void gameHistoryView()
     LinkedListNode<MathGame>? gameNode = gameHistory.First;
     int gameIndex = gameHistory.Count;
 
-    Console.Write($"\n{GHViewTitle}\n");
-
     while (inGHView)
     {
         clearWindow();
+
+        Console.Write($"\n{GHViewTitle}\n");
+
         displayMessages();
+
         Console.Write($"\ngame {gameIndex}/{gameHistory.Count}\n\n");
         gameNode.Value.print();
         Console.Write($"\n\n{GHMenu}");
         cmdString = Console.ReadLine();
 
-        if (!isValidOption(cmdString, 3))
+        if (!isValidOption(cmdString, GHMenu.Count(c => c == '\n') - 1, out cmd))
         {
             messages.Add("invalid option");
             continue;
         }
-
-        cmd = int.Parse(cmdString.Trim());
 
         switch (cmd)
         {
@@ -147,20 +131,17 @@ do
 {
     clearWindow();
 
-    displayMessages();
-
     Console.Write($"\n{mathGameTitle}\n");
+    displayMessages();
 
     Console.Write($"\ntotal : {total}\n\n{prompt}");
     cmdString = Console.ReadLine();
 
-    if (!isValidOption(cmdString, 5))
+    if (!isValidOption(cmdString, prompt.Count(c => c == '\n') - 1, out cmd))
     {
         messages.Add("invalid option");
         continue;
     }
-
-    cmd = int.Parse(cmdString.Trim());
 
     if (cmd == 4 && (total < 0 || total > 100))
     {
@@ -177,13 +158,11 @@ do
 
     argString = Console.ReadLine();
 
-    if (!isValidArg(argString))
+    if (!int.TryParse(argString, out arg))
     {
         messages.Add("invalid argument");
         continue;
     }
-
-    arg = int.Parse(argString.Trim());
 
     prev = total;
 
@@ -199,7 +178,7 @@ do
             total *= arg;
             break;
         case 4:
-            total /= arg;
+            divide(ref total, arg);
             break;
     }
 

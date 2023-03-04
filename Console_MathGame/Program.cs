@@ -141,7 +141,7 @@ void gameHistoryView()
 }
 
 string? cmdString, argString;
-int total = 0, arg, cmd;
+int total = 0, arg, cmd, prev;
 
 do
 {
@@ -185,6 +185,8 @@ do
 
     arg = int.Parse(argString.Trim());
 
+    prev = total;
+
     switch (cmd)
     {
         case 1:
@@ -201,23 +203,24 @@ do
             break;
     }
 
-    gameHistory.AddFirst(new MathGame(total, arg, cmd));
+    gameHistory.AddFirst(new MathGame(prev, arg, total, cmd));
 }
 while (true);
 
 struct MathGame
 {
+    int[] operands = new int[2];
     int result;
-    int arg;
     int operation;
-    public MathGame(int result, int arg, int operation)
+    public MathGame(int arg1, int arg2, int result, int operation)
     {
+        this.operands[0] = arg1;
+        this.operands[1] = arg2;
         this.result = result;
-        this.arg = arg;
         this.operation = operation;
     }
     public void print()
     {
-        Console.Write($"total: {result}\narg: {arg}\noperation: {operation}");
+        Console.Write($"{operands[0]} {(operation == 1 ? '+' : operation == 2 ? '-' : operation == 3 ? '*' : '/')} {operands[1]} = {result}");
     }
 }

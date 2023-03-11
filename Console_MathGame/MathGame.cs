@@ -68,6 +68,7 @@ namespace Console_MathGame
             }
         }
 
+        // main game loop
         private void GameLoop()
         {
             random = new();
@@ -80,10 +81,12 @@ namespace Console_MathGame
                 Console.Clear();
                 b = random.Next(50);
                 DisplayMainScreen();
+
+                // input loop
                 do
                 {
                     key = Console.ReadKey(true).Key;
-                    if(key == ConsoleKey.Escape)
+                    if (key == ConsoleKey.Escape)
                     {
                         Console.Clear();
                         Environment.Exit(0);
@@ -144,6 +147,7 @@ namespace Console_MathGame
             FlashMessage($"END OF GAME\nYOU {(Math.Abs(target - result) <= winAccuracy ? "WON" : "LOST")}");
         }
 
+        // inner class to keep track of previous games
         private class GameHistory
         {
             private bool inGHView;
@@ -156,7 +160,6 @@ namespace Console_MathGame
                 "{2}\n\n" +
                 "<- previous (left arrow)\tEsc to exit\tnext (right arrow) ->";
 
-            // past games are stored here
             private LinkedList<MathGameInfo> history = new();
 
             public void Add(MathGameInfo mathGameInfo)
@@ -169,27 +172,7 @@ namespace Console_MathGame
                 Console.WriteLine(gameHistoryScreen, gameIndex, history.Count, gameNode.Value.ToString());
             }
 
-            private bool GHNext()
-            {
-                if (gameNode.Next == null)
-                {
-                    return false;
-                }
-                gameNode = gameNode.Next;
-                return true;
-            }
-
-            private bool GHPrev()
-            {
-                if (gameNode.Previous == null)
-                {
-                    return false;
-                }
-                gameNode = gameNode.Previous;
-                return true;
-            }
-
-            // loop for the game history view
+            // game history view loop
             public void View()
             {
                 if (history.Count == 0)
@@ -205,24 +188,22 @@ namespace Console_MathGame
                 {
                     Console.Clear();
                     DisplayGameHistoryScreen();
+
+                    // input loop
                     do
                     {
                         key = Console.ReadKey(true).Key;
-                        if (key == ConsoleKey.LeftArrow)
+                        if (key == ConsoleKey.LeftArrow && gameNode.Next != null)
                         {
-                            if (GHNext())
-                            {
-                                gameIndex--;
-                                break;
-                            }
+                            gameNode = gameNode.Next;
+                            gameIndex--;
+                            break;
                         }
-                        else if (key == ConsoleKey.RightArrow)
+                        else if (key == ConsoleKey.RightArrow && gameNode.Previous != null)
                         {
-                            if (GHPrev())
-                            {
-                                gameIndex++;
-                                break;
-                            }
+                            gameNode = gameNode.Previous;
+                            gameIndex++;
+                            break;
                         }
                         else if (key == ConsoleKey.Escape)
                         {

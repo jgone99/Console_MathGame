@@ -134,6 +134,7 @@ namespace Console_MathGame
                         }
                         else
                         {
+                            // makes sure unrecognized inputs don't unnecessarily re-display the screen
                             continue;
                         }
                         DisplayMainScreen();
@@ -219,6 +220,7 @@ namespace Console_MathGame
         }
     }
 
+    // representation of previous games
     struct MathGameInfo
     {
         private int rounds, target, result;

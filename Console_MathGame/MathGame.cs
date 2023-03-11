@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
 
 namespace Console_MathGame
 {
@@ -33,22 +32,14 @@ namespace Console_MathGame
             "3. *\n" +
             "4. /\n" +
             "5. view game history\n" +
-            "6. instructions";
-
-        private static void ClearWindow()
-        {
-            (int cX, int cY) = Console.GetCursorPosition();
-            StringBuilder newWindow = new();
-            newWindow.Append('\n', Console.WindowHeight);
-            Console.Write(newWindow);
-            Console.SetCursorPosition(cX, cY);
-        }
+            "6. instructions\n\n" +
+            "Esc to end game";
 
         // flash a message on screen until a key is read from input or until the
         // specified time interval has elapsed.
         private static void FlashMessage(string message, TimeSpan? interval = null)
         {
-            ClearWindow();
+            Console.Clear();
             if (interval.HasValue)
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
@@ -61,7 +52,7 @@ namespace Console_MathGame
                 while (!Console.KeyAvailable) ;
                 _ = Console.ReadKey(true);
             }
-            ClearWindow();
+            Console.Clear();
         }
 
         private void DisplayMainScreen()
@@ -80,22 +71,24 @@ namespace Console_MathGame
         private void GameLoop()
         {
             random = new();
-            target = random.Next(100);
-            result = random.Next(99);
+            target = random.Next(101);
+            result = random.Next(100);
             rounds = 0;
             ConsoleKey key;
             do
             {
-                ClearWindow();
-
+                Console.Clear();
                 b = random.Next(50);
-
                 DisplayMainScreen();
-
                 do
                 {
                     key = Console.ReadKey(true).Key;
-                    if (key == ConsoleKey.D1)
+                    if(key == ConsoleKey.Escape)
+                    {
+                        Console.Clear();
+                        Environment.Exit(0);
+                    }
+                    else if (key == ConsoleKey.D1)
                     {
                         result += b;
                         break;
@@ -144,11 +137,9 @@ namespace Console_MathGame
                     }
                 }
                 while (true);
-
                 isGameRunning = ++rounds < roundLimit && Math.Abs(target - result) > winAccuracy;
             }
             while (isGameRunning);
-
             gameHistory.Add(new MathGameInfo(rounds, target, result, Math.Abs(target - result) <= winAccuracy));
             FlashMessage($"END OF GAME\nYOU {(Math.Abs(target - result) <= winAccuracy ? "WON" : "LOST")}");
         }
@@ -206,18 +197,14 @@ namespace Console_MathGame
                     FlashMessage("Game history is empty");
                     return;
                 }
-
                 ConsoleKey key;
                 inGHView = true;
                 gameNode = history.First;
                 gameIndex = history.Count;
-
                 do
                 {
-                    ClearWindow();
-
+                    Console.Clear();
                     DisplayGameHistoryScreen();
-
                     do
                     {
                         key = Console.ReadKey(true).Key;
@@ -246,7 +233,7 @@ namespace Console_MathGame
                     while (true);
                 }
                 while (inGHView);
-                ClearWindow();
+                Console.Clear();
             }
         }
     }
